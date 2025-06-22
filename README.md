@@ -1,99 +1,136 @@
-from tkinter import *
-from tkinter import ttk, messagebox, simpledialog
+import tkinter as tk
+from tkinter import messagebox, ttk
 import random
-import csv
-from datetime import datetime
+import os
 
-COR_PRIMARIA = "#004aad"
-COR_SECUNDARIA = "#ffcc00"
+COR_FUNDO = "#003366"
+COR_DESTAQUE = "#FFD700"
+COR_TEXTO = "#FFFFFF"
 
-premios = [
-    1000, 2000, 3000, 4000, 5000,
-    10000, 20000, 30000, 40000, 60000,
-    80000, 100000, 200000, 300000, 400000,
-    500000, 1000000
-]
-
-def nome_nivel(numero):
-    if numero <= 5:
-        return f"facil_{numero}"
-    elif numero <= 10:
-        return f"media_{numero}"
-    elif numero <= 15:
-        return f"dificil_{numero}"
-    else:
-        return f"muito_dificil_{numero}"
 
 perguntas_por_nivel = {
     "facil_1": [
         {"pergunta": "Quanto é 1 + 1?", "opcoes": {"A": "1", "B": "2", "C": "3", "D": "4"}, "resposta": "B"},
-        {"pergunta": "Qual cor representa o céu durante o dia?", "opcoes": {"A": "Azul", "B": "Verde", "C": "Roxo", "D": "Preto"}, "resposta": "A"},
-        {"pergunta": "Qual o oposto de quente?", "opcoes": {"A": "Frio", "B": "Forte", "C": "Lento", "D": "Rápido"}, "resposta": "A"},
-        {"pergunta": "Quantas patas tem um cachorro?", "opcoes": {"A": "2", "B": "3", "C": "4", "D": "5"}, "resposta": "C"},
-        {"pergunta": "Qual é o plural de 'cão'?", "opcoes": {"A": "Cãos", "B": "Cãoses", "C": "Cães", "D": "Cãez"}, "resposta": "C"}
+        {"pergunta": "Qual cor representa o céu durante o dia?",
+         "opcoes": {"A": "Azul", "B": "Verde", "C": "Roxo", "D": "Preto"}, "resposta": "A"},
+        {"pergunta": "Qual o oposto de quente?", "opcoes": {"A": "Frio", "B": "Forte", "C": "Lento", "D": "Rápido"},
+         "resposta": "A"},
+        {"pergunta": "Quantas patas tem um cachorro?", "opcoes": {"A": "2", "B": "3", "C": "4", "D": "5"},
+         "resposta": "C"},
+        {"pergunta": "Qual é o plural de 'cão'?", "opcoes": {"A": "Cãos", "B": "Cãoses", "C": "Cães", "D": "Cãez"},
+         "resposta": "C"}
     ],
     "facil_2": [
-        {"pergunta": "Qual desses é um vegetal?", "opcoes": {"A": "Carro", "B": "Cenoura", "C": "Mesa", "D": "Livro"}, "resposta": "B"},
-        {"pergunta": "Qual o número que vem depois do 5?", "opcoes": {"A": "6", "B": "7", "C": "4", "D": "8"}, "resposta": "A"},
-        {"pergunta": "Qual desses é um animal?", "opcoes": {"A": "Computador", "B": "Gato", "C": "Mesa", "D": "Telefone"}, "resposta": "B"},
-        {"pergunta": "De que cor é a banana madura?", "opcoes": {"A": "Verde", "B": "Amarela", "C": "Azul", "D": "Roxa"}, "resposta": "B"},
-        {"pergunta": "Qual a forma de uma bola?", "opcoes": {"A": "Quadrada", "B": "Triangular", "C": "Oval", "D": "Redonda"}, "resposta": "D"}
+        {"pergunta": "Qual desses é um vegetal?", "opcoes": {"A": "Carro", "B": "Cenoura", "C": "Mesa", "D": "Livro"},
+         "resposta": "B"},
+        {"pergunta": "Qual o número que vem depois do 5?", "opcoes": {"A": "6", "B": "7", "C": "4", "D": "8"},
+         "resposta": "A"},
+        {"pergunta": "Qual desses é um animal?",
+         "opcoes": {"A": "Computador", "B": "Gato", "C": "Mesa", "D": "Telefone"}, "resposta": "B"},
+        {"pergunta": "De que cor é a banana madura?",
+         "opcoes": {"A": "Verde", "B": "Amarela", "C": "Azul", "D": "Roxa"}, "resposta": "B"},
+        {"pergunta": "Qual a forma de uma bola?",
+         "opcoes": {"A": "Quadrada", "B": "Triangular", "C": "Oval", "D": "Redonda"}, "resposta": "D"}
     ],
     "facil_3": [
-        {"pergunta": "Qual o nome do nosso planeta?", "opcoes": {"A": "Marte", "B": "Júpiter", "C": "Terra", "D": "Vênus"}, "resposta": "C"},
-        {"pergunta": "O que usamos para escrever?", "opcoes": {"A": "Martelo", "B": "Caneta", "C": "Colher", "D": "Tesoura"}, "resposta": "B"},
-        {"pergunta": "Qual é o contrário de alto?", "opcoes": {"A": "Curto", "B": "Grande", "C": "Baixo", "D": "Fraco"}, "resposta": "C"},
-        {"pergunta": "Qual parte do corpo usamos para ver?", "opcoes": {"A": "Mãos", "B": "Olhos", "C": "Pernas", "D": "Ouvidos"}, "resposta": "B"},
-        {"pergunta": "Qual animal mia?", "opcoes": {"A": "Cachorro", "B": "Gato", "C": "Pássaro", "D": "Peixe"}, "resposta": "B"}
+        {"pergunta": "Qual o nome do nosso planeta?",
+         "opcoes": {"A": "Marte", "B": "Júpiter", "C": "Terra", "D": "Vênus"}, "resposta": "C"},
+        {"pergunta": "O que usamos para escrever?",
+         "opcoes": {"A": "Martelo", "B": "Caneta", "C": "Colher", "D": "Tesoura"}, "resposta": "B"},
+        {"pergunta": "Qual é o contrário de alto?", "opcoes": {"A": "Curto", "B": "Grande", "C": "Baixo", "D": "Fraco"},
+         "resposta": "C"},
+        {"pergunta": "Qual parte do corpo usamos para ver?",
+         "opcoes": {"A": "Mãos", "B": "Olhos", "C": "Pernas", "D": "Ouvidos"}, "resposta": "B"},
+        {"pergunta": "Qual animal mia?", "opcoes": {"A": "Cachorro", "B": "Gato", "C": "Pássaro", "D": "Peixe"},
+         "resposta": "B"}
     ],
     "facil_4": [
-        {"pergunta": "Qual o nome do líquido que bebemos?", "opcoes": {"A": "Ferro", "B": "Vento", "C": "Água", "D": "Areia"}, "resposta": "C"},
-        {"pergunta": "Qual é o primeiro mês do ano?", "opcoes": {"A": "Dezembro", "B": "Julho", "C": "Janeiro", "D": "Março"}, "resposta": "C"},
-        {"pergunta": "De qual cor é a laranja?", "opcoes": {"A": "Amarela", "B": "Roxa", "C": "Verde", "D": "Laranja"}, "resposta": "D"},
-        {"pergunta": "Qual desses é um meio de transporte?", "opcoes": {"A": "Avião", "B": "Mesa", "C": "Travesseiro", "D": "Janela"}, "resposta": "A"},
-        {"pergunta": "O que usamos para comer sopa?", "opcoes": {"A": "Garfo", "B": "Faca", "C": "Colher", "D": "Caneta"}, "resposta": "C"}
+        {"pergunta": "Qual o nome do líquido que bebemos?",
+         "opcoes": {"A": "Ferro", "B": "Vento", "C": "Água", "D": "Areia"}, "resposta": "C"},
+        {"pergunta": "Qual é o primeiro mês do ano?",
+         "opcoes": {"A": "Dezembro", "B": "Julho", "C": "Janeiro", "D": "Março"}, "resposta": "C"},
+        {"pergunta": "De qual cor é a laranja?", "opcoes": {"A": "Amarela", "B": "Roxa", "C": "Verde", "D": "Laranja"},
+         "resposta": "D"},
+        {"pergunta": "Qual desses é um meio de transporte?",
+         "opcoes": {"A": "Avião", "B": "Mesa", "C": "Travesseiro", "D": "Janela"}, "resposta": "A"},
+        {"pergunta": "O que usamos para comer sopa?",
+         "opcoes": {"A": "Garfo", "B": "Faca", "C": "Colher", "D": "Caneta"}, "resposta": "C"}
     ],
     "facil_5": [
-        {"pergunta": "Qual o menor número natural?", "opcoes": {"A": "1", "B": "0", "C": "2", "D": "-1"}, "resposta": "B"},
-        {"pergunta": "Qual animal produz leite?", "opcoes": {"A": "Galo", "B": "Cavalo", "C": "Vaca", "D": "Tigre"}, "resposta": "C"},
-        {"pergunta": "Quem é o personagem principal da Bíblia?", "opcoes": {"A": "Moisés", "B": "Adão", "C": "Jesus", "D": "Noé"}, "resposta": "C"},
-        {"pergunta": "O que fazemos quando estamos cansados?", "opcoes": {"A": "Dormimos", "B": "Comemos", "C": "Corremos", "D": "Pulamos"}, "resposta": "A"},
-        {"pergunta": "Qual é a moeda usada no Brasil?", "opcoes": {"A": "Dólar", "B": "Peso", "C": "Real", "D": "Euro"}, "resposta": "C"}
+        {"pergunta": "Qual o menor número natural?", "opcoes": {"A": "1", "B": "0", "C": "2", "D": "-1"},
+         "resposta": "B"},
+        {"pergunta": "Qual animal produz leite?", "opcoes": {"A": "Galo", "B": "Cavalo", "C": "Vaca", "D": "Tigre"},
+         "resposta": "C"},
+        {"pergunta": "Quem é o personagem principal da Bíblia?",
+         "opcoes": {"A": "Moisés", "B": "Adão", "C": "Jesus", "D": "Noé"}, "resposta": "C"},
+        {"pergunta": "O que fazemos quando estamos cansados?",
+         "opcoes": {"A": "Dormimos", "B": "Comemos", "C": "Corremos", "D": "Pulamos"}, "resposta": "A"},
+        {"pergunta": "Qual é a moeda usada no Brasil?", "opcoes": {"A": "Dólar", "B": "Peso", "C": "Real", "D": "Euro"},
+         "resposta": "C"}
     ],
-        "media_6": [
-        {"pergunta": "Qual a capital da França?", "opcoes": {"A": "Paris", "B": "Londres", "C": "Roma", "D": "Berlim"}, "resposta": "A"},
-        {"pergunta": "Quem escreveu 'O Pequeno Príncipe'?", "opcoes": {"A": "Saint-Exupéry", "B": "Machado de Assis", "C": "J. K. Rowling", "D": "Monteiro Lobato"}, "resposta": "A"},
-        {"pergunta": "Quantos segundos tem um minuto?", "opcoes": {"A": "60", "B": "90", "C": "30", "D": "100"}, "resposta": "A"},
-        {"pergunta": "Qual é o símbolo químico da água?", "opcoes": {"A": "H2O", "B": "O2", "C": "CO2", "D": "NaCl"}, "resposta": "A"},
-        {"pergunta": "Quem descobriu o Brasil?", "opcoes": {"A": "Pedro Álvares Cabral", "B": "Dom Pedro I", "C": "Tiradentes", "D": "Cabral Machado"}, "resposta": "A"}
+    "media_6": [
+        {"pergunta": "Qual a capital da França?", "opcoes": {"A": "Paris", "B": "Londres", "C": "Roma", "D": "Berlim"},
+         "resposta": "A"},
+        {"pergunta": "Quem escreveu 'O Pequeno Príncipe'?",
+         "opcoes": {"A": "Saint-Exupéry", "B": "Machado de Assis", "C": "J. K. Rowling", "D": "Monteiro Lobato"},
+         "resposta": "A"},
+        {"pergunta": "Quantos segundos tem um minuto?", "opcoes": {"A": "60", "B": "90", "C": "30", "D": "100"},
+         "resposta": "A"},
+        {"pergunta": "Qual é o símbolo químico da água?", "opcoes": {"A": "H2O", "B": "O2", "C": "CO2", "D": "NaCl"},
+         "resposta": "A"},
+        {"pergunta": "Quem descobriu o Brasil?",
+         "opcoes": {"A": "Pedro Álvares Cabral", "B": "Dom Pedro I", "C": "Tiradentes", "D": "Cabral Machado"},
+         "resposta": "A"}
     ],
     "media_7": [
-        {"pergunta": "Quantos estados tem o Brasil?", "opcoes": {"A": "26", "B": "27", "C": "25", "D": "28"}, "resposta": "B"},
-        {"pergunta": "Qual é o maior país do mundo em extensão territorial?", "opcoes": {"A": "Canadá", "B": "China", "C": "Rússia", "D": "EUA"}, "resposta": "C"},
-        {"pergunta": "Qual é o planeta mais próximo do Sol?", "opcoes": {"A": "Vênus", "B": "Terra", "C": "Marte", "D": "Mercúrio"}, "resposta": "D"},
-        {"pergunta": "Qual o valor de π (pi) aproximado?", "opcoes": {"A": "2,71", "B": "1,61", "C": "3,14", "D": "4,13"}, "resposta": "C"},
-        {"pergunta": "Qual é o coletivo de lobos?", "opcoes": {"A": "Bando", "B": "Matilha", "C": "Cardume", "D": "Manada"}, "resposta": "B"}
+        {"pergunta": "Quantos estados tem o Brasil?", "opcoes": {"A": "26", "B": "27", "C": "25", "D": "28"},
+         "resposta": "B"},
+        {"pergunta": "Qual é o maior país do mundo em extensão territorial?",
+         "opcoes": {"A": "Canadá", "B": "China", "C": "Rússia", "D": "EUA"}, "resposta": "C"},
+        {"pergunta": "Qual é o planeta mais próximo do Sol?",
+         "opcoes": {"A": "Vênus", "B": "Terra", "C": "Marte", "D": "Mercúrio"}, "resposta": "D"},
+        {"pergunta": "Qual o valor de π (pi) aproximado?",
+         "opcoes": {"A": "2,71", "B": "1,61", "C": "3,14", "D": "4,13"}, "resposta": "C"},
+        {"pergunta": "Qual é o coletivo de lobos?",
+         "opcoes": {"A": "Bando", "B": "Matilha", "C": "Cardume", "D": "Manada"}, "resposta": "B"}
     ],
     "media_8": [
-        {"pergunta": "Qual é o maior oceano do planeta?", "opcoes": {"A": "Atlântico", "B": "Índico", "C": "Pacífico", "D": "Ártico"}, "resposta": "C"},
-        {"pergunta": "Qual destes é um mamífero?", "opcoes": {"A": "Jacaré", "B": "Pinguim", "C": "Golfinho", "D": "Galinha"}, "resposta": "C"},
-        {"pergunta": "Quem foi Albert Einstein?", "opcoes": {"A": "Pintor", "B": "Físico", "C": "Político", "D": "Músico"}, "resposta": "B"},
-        {"pergunta": "Qual instrumento mede temperatura?", "opcoes": {"A": "Barômetro", "B": "Régua", "C": "Termômetro", "D": "Bússola"}, "resposta": "C"},
-        {"pergunta": "Qual é o plural de lápis?", "opcoes": {"A": "Lápizes", "B": "Lápis", "C": "Lápises", "D": "Lápisus"}, "resposta": "B"}
+        {"pergunta": "Qual é o maior oceano do planeta?",
+         "opcoes": {"A": "Atlântico", "B": "Índico", "C": "Pacífico", "D": "Ártico"}, "resposta": "C"},
+        {"pergunta": "Qual destes é um mamífero?",
+         "opcoes": {"A": "Jacaré", "B": "Pinguim", "C": "Golfinho", "D": "Galinha"}, "resposta": "C"},
+        {"pergunta": "Quem foi Albert Einstein?",
+         "opcoes": {"A": "Pintor", "B": "Físico", "C": "Político", "D": "Músico"}, "resposta": "B"},
+        {"pergunta": "Qual instrumento mede temperatura?",
+         "opcoes": {"A": "Barômetro", "B": "Régua", "C": "Termômetro", "D": "Bússola"}, "resposta": "C"},
+        {"pergunta": "Qual é o plural de lápis?",
+         "opcoes": {"A": "Lápizes", "B": "Lápis", "C": "Lápises", "D": "Lápisus"}, "resposta": "B"}
     ],
     "media_9": [
-        {"pergunta": "O que significa ONU?", "opcoes": {"A": "Organização Nacional Unida", "B": "Ordem Nacional Urbana", "C": "Organização das Nações Unidas", "D": "Oficina Nacional Unida"}, "resposta": "C"},
-        {"pergunta": "Quem pintou a Mona Lisa?", "opcoes": {"A": "Van Gogh", "B": "Michelangelo", "C": "Leonardo da Vinci", "D": "Rafael"}, "resposta": "C"},
-        {"pergunta": "Qual é o menor país do mundo?", "opcoes": {"A": "Monaco", "B": "Vaticano", "C": "Malta", "D": "Luxemburgo"}, "resposta": "B"},
-        {"pergunta": "Quem inventou o telefone?", "opcoes": {"A": "Einstein", "B": "Galileu", "C": "Alexander Graham Bell", "D": "Edison"}, "resposta": "C"},
-        {"pergunta": "Qual é a capital de Minas Gerais?", "opcoes": {"A": "Belo Horizonte", "B": "Vitória", "C": "Salvador", "D": "Goiânia"}, "resposta": "A"}
+        {"pergunta": "O que significa ONU?", "opcoes": {"A": "Organização Nacional Unida", "B": "Ordem Nacional Urbana",
+                                                        "C": "Organização das Nações Unidas",
+                                                        "D": "Oficina Nacional Unida"}, "resposta": "C"},
+        {"pergunta": "Quem pintou a Mona Lisa?",
+         "opcoes": {"A": "Van Gogh", "B": "Michelangelo", "C": "Leonardo da Vinci", "D": "Rafael"}, "resposta": "C"},
+        {"pergunta": "Qual é o menor país do mundo?",
+         "opcoes": {"A": "Monaco", "B": "Vaticano", "C": "Malta", "D": "Luxemburgo"}, "resposta": "B"},
+        {"pergunta": "Quem inventou o telefone?",
+         "opcoes": {"A": "Einstein", "B": "Galileu", "C": "Alexander Graham Bell", "D": "Edison"}, "resposta": "C"},
+        {"pergunta": "Qual é a capital de Minas Gerais?",
+         "opcoes": {"A": "Belo Horizonte", "B": "Vitória", "C": "Salvador", "D": "Goiânia"}, "resposta": "A"}
     ],
     "media_10": [
-        {"pergunta": "Quem escreveu Dom Casmurro?", "opcoes": {"A": "José de Alencar", "B": "Machado de Assis", "C": "Manuel Bandeira", "D": "Clarice Lispector"}, "resposta": "B"},
-        {"pergunta": "Quanto é a raiz quadrada de 81?", "opcoes": {"A": "8", "B": "9", "C": "10", "D": "7"}, "resposta": "B"},
-        {"pergunta": "Qual é a capital do Canadá?", "opcoes": {"A": "Toronto", "B": "Ottawa", "C": "Vancouver", "D": "Montreal"}, "resposta": "B"},
-        {"pergunta": "Quem descobriu a gravidade?", "opcoes": {"A": "Einstein", "B": "Kepler", "C": "Newton", "D": "Galileu"}, "resposta": "C"},
-        {"pergunta": "Em qual continente está o Egito?", "opcoes": {"A": "Ásia", "B": "Europa", "C": "América", "D": "África"}, "resposta": "D"}
+        {"pergunta": "Quem escreveu Dom Casmurro?",
+         "opcoes": {"A": "José de Alencar", "B": "Machado de Assis", "C": "Manuel Bandeira", "D": "Clarice Lispector"},
+         "resposta": "B"},
+        {"pergunta": "Quanto é a raiz quadrada de 81?", "opcoes": {"A": "8", "B": "9", "C": "10", "D": "7"},
+         "resposta": "B"},
+        {"pergunta": "Qual é a capital do Canadá?",
+         "opcoes": {"A": "Toronto", "B": "Ottawa", "C": "Vancouver", "D": "Montreal"}, "resposta": "B"},
+        {"pergunta": "Quem descobriu a gravidade?",
+         "opcoes": {"A": "Einstein", "B": "Kepler", "C": "Newton", "D": "Galileu"}, "resposta": "C"},
+        {"pergunta": "Em qual continente está o Egito?",
+         "opcoes": {"A": "Ásia", "B": "Europa", "C": "América", "D": "África"}, "resposta": "D"}
     ],
     "dificil_11": [
         {"pergunta": "Qual é o elemento químico de símbolo 'Au'?",
@@ -156,156 +193,281 @@ perguntas_por_nivel = {
         {"pergunta": "Qual é o idioma mais falado no mundo?",
          "opcoes": {"A": "Inglês", "B": "Espanhol", "C": "Chinês mandarim", "D": "Hindi"}, "resposta": "C"}
     ],
-        "muito_dificil_16": [
-        {"pergunta": "Quem formulou a Teoria do Big Bang?", "opcoes": {"A": "Stephen Hawking", "B": "Georges Lemaître", "C": "Albert Einstein", "D": "Isaac Newton"}, "resposta": "B"},
-        {"pergunta": "Qual a equação da segunda lei de Newton?", "opcoes": {"A": "F = m/a", "B": "E = mc²", "C": "F = m×a", "D": "P = mv"}, "resposta": "C"},
-        {"pergunta": "Quem escreveu 'O Ser e o Nada'?", "opcoes": {"A": "Sartre", "B": "Nietzsche", "C": "Heidegger", "D": "Foucault"}, "resposta": "A"},
-        {"pergunta": "Quantos elétrons cabem na camada K de um átomo?", "opcoes": {"A": "2", "B": "8", "C": "18", "D": "32"}, "resposta": "A"},
-        {"pergunta": "Quem desenvolveu o modelo atômico de 1913?", "opcoes": {"A": "Bohr", "B": "Thomson", "C": "Rutherford", "D": "Dalton"}, "resposta": "A"}
+    "muito_dificil_16": [
+        {"pergunta": "Quem formulou a Teoria do Big Bang?",
+         "opcoes": {"A": "Stephen Hawking", "B": "Georges Lemaître", "C": "Albert Einstein", "D": "Isaac Newton"},
+         "resposta": "B"},
+        {"pergunta": "Qual a equação da segunda lei de Newton?",
+         "opcoes": {"A": "F = m/a", "B": "E = mc²", "C": "F = m×a", "D": "P = mv"}, "resposta": "C"},
+        {"pergunta": "Quem escreveu 'O Ser e o Nada'?",
+         "opcoes": {"A": "Sartre", "B": "Nietzsche", "C": "Heidegger", "D": "Foucault"}, "resposta": "A"},
+        {"pergunta": "Quantos elétrons cabem na camada K de um átomo?",
+         "opcoes": {"A": "2", "B": "8", "C": "18", "D": "32"}, "resposta": "A"},
+        {"pergunta": "Quem desenvolveu o modelo atômico de 1913?",
+         "opcoes": {"A": "Bohr", "B": "Thomson", "C": "Rutherford", "D": "Dalton"}, "resposta": "A"}
     ],
     "muito_dificil_17": [
-        {"pergunta": "Qual é o valor da constante de Planck?", "opcoes": {"A": "6,63×10⁻³⁴ J·s", "B": "3,00×10⁸ m/s", "C": "1,60×10⁻¹⁹ C", "D": "9,81 m/s²"}, "resposta": "A"},
-        {"pergunta": "O que é o número de Avogadro?", "opcoes": {"A": "6,02×10²³", "B": "1,38×10⁻²³", "C": "3,14", "D": "9,1×10⁻³¹"}, "resposta": "A"},
-        {"pergunta": "Quem escreveu 'Crítica da Razão Pura'?", "opcoes": {"A": "Kant", "B": "Hegel", "C": "Nietzsche", "D": "Descartes"}, "resposta": "A"},
-        {"pergunta": "Qual cientista descobriu os raios X?", "opcoes": {"A": "Wilhelm Röntgen", "B": "Marie Curie", "C": "James Clerk Maxwell", "D": "Rutherford"}, "resposta": "A"},
-        {"pergunta": "Qual é a função dos ribossomos nas células?", "opcoes": {"A": "Síntese de proteínas", "B": "Respiração celular", "C": "Digestão celular", "D": "Produção de energia"}, "resposta": "A"}
+        {"pergunta": "Qual é o valor da constante de Planck?",
+         "opcoes": {"A": "6,63×10⁻³⁴ J·s", "B": "3,00×10⁸ m/s", "C": "1,60×10⁻¹⁹ C", "D": "9,81 m/s²"},
+         "resposta": "A"},
+        {"pergunta": "O que é o número de Avogadro?",
+         "opcoes": {"A": "6,02×10²³", "B": "1,38×10⁻²³", "C": "3,14", "D": "9,1×10⁻³¹"}, "resposta": "A"},
+        {"pergunta": "Quem escreveu 'Crítica da Razão Pura'?",
+         "opcoes": {"A": "Kant", "B": "Hegel", "C": "Nietzsche", "D": "Descartes"}, "resposta": "A"},
+        {"pergunta": "Qual cientista descobriu os raios X?",
+         "opcoes": {"A": "Wilhelm Röntgen", "B": "Marie Curie", "C": "James Clerk Maxwell", "D": "Rutherford"},
+         "resposta": "A"},
+        {"pergunta": "Qual é a função dos ribossomos nas células?",
+         "opcoes": {"A": "Síntese de proteínas", "B": "Respiração celular", "C": "Digestão celular",
+                    "D": "Produção de energia"}, "resposta": "A"}
     ]
 }
 
-def salvar_pontuacao(nome, pontuacao):
-    with open("ranking.csv", mode="a", newline="", encoding="utf-8") as arquivo:
-        writer = csv.writer(arquivo)
-        writer.writerow([nome, pontuacao, datetime.now().strftime("%d/%m/%Y %H:%M")])
+premios = [
+    1000, 2000, 3000, 4000, 5000,
+    10000, 20000, 30000, 40000, 60000,
+    80000, 100000, 200000, 300000, 400000,
+    500000, 1000000
+]
 
-def mostrar_ranking():
+def nome_nivel(numero):
+    if numero <= 5:
+        return f"facil_{numero}"
+    elif numero <= 10:
+        return f"media_{numero}"
+    elif numero <= 15:
+        return f"dificil_{numero}"
+    else:
+        return f"muito_dificil_{numero}"
+
+def salvar_ranking(nome, pontuacao):
+    with open("ranking.txt", "a", encoding="utf-8") as f:
+        f.write(f"{nome}:{pontuacao}\n")
+
+def exibir_ranking():
     try:
-        with open("ranking.csv", "r", encoding="utf-8") as arquivo:
-            linhas = list(csv.reader(arquivo))
-            linhas.sort(key=lambda x: int(x[1]), reverse=True)
-            top = "\n".join([f"{l[0]} - R$ {l[1]}" for l in linhas[:5]])
-            messagebox.showinfo("Ranking", f"🏆 TOP 5 JOGADORES:\n\n{top}")
+        with open("ranking.txt", "r", encoding="utf-8") as f:
+            linhas = f.readlines()
+            ranking = []
+            for linha in linhas:
+                if ":" in linha:
+                    nome, pontos = linha.strip().split(":")
+                    ranking.append((nome, int(pontos)))
+            ranking.sort(key=lambda x: x[1], reverse=True)
+            return ranking[:20]
     except FileNotFoundError:
-        messagebox.showinfo("Ranking", "Ainda não há pontuações salvas.")
-
-
-def ajuda_cartas(opcoes, correta):
-    erradas = [k for k in opcoes if k != correta]
-    eliminadas = random.sample(erradas, 2)
-    restantes = [l for l in opcoes if l not in eliminadas]
-    return "\n".join([f"{l}) {opcoes[l]}" for l in restantes])
-
-def ajuda_universitarios(correta):
-    sugestao = correta if random.random() < 0.8 else random.choice([l for l in "ABCD" if l != correta])
-    return f"Acho que a resposta é: {sugestao}"
-
-def ajuda_plateia(correta):
-    porcentagens = {"A": 0, "B": 0, "C": 0, "D": 0}
-    correta_chance = random.randint(60, 80)
-    restantes = [l for l in "ABCD" if l != correta]
-    restantes_chances = sorted([random.randint(5, 20) for _ in range(3)])
-    random.shuffle(restantes)
-    porcentagens[correta] = correta_chance
-    for letra, chance in zip(restantes, restantes_chances):
-        porcentagens[letra] = chance
-    return "\n".join([f"{l}) {porcentagens[l]}%" for l in "ABCD"])
+        return []
 
 class ShowDoMilhao:
     def __init__(self, root):
         self.root = root
         self.root.title("Show do Milhão")
-        self.root.geometry("600x500")
-        self.root.configure(bg=COR_PRIMARIA)
+        self.root.configure(bg=COR_FUNDO)
 
-        self.estilo = ttk.Style()
-        self.estilo.theme_use("clam")
-        self.estilo.configure("TButton", font=("Arial", 12), padding=10, background=COR_SECUNDARIA)
-
-        self.frame = Frame(root, bg=COR_PRIMARIA)
-        self.frame.pack(expand=True)
-
-        self.label_titulo = Label(self.frame, text="SHOW DO MILHÃO", font=("Arial Black", 20), bg=COR_PRIMARIA, fg=COR_SECUNDARIA)
-        self.label_titulo.pack(pady=20)
-
-        self.botao_jogar = ttk.Button(self.frame, text="Jogar", command=self.iniciar_jogo)
-        self.botao_jogar.pack(pady=10)
-
-        self.botao_ranking = ttk.Button(self.frame, text="Ranking", command=mostrar_ranking)
-        self.botao_ranking.pack(pady=10)
-
-        self.botao_sair = ttk.Button(self.frame, text="Sair", command=root.quit)
-        self.botao_sair.pack(pady=10)
-
-    def iniciar_jogo(self):
-        self.frame.destroy()
-        self.nome_jogador = simpledialog.askstring("Nome", "Digite seu nome:")
-        if not self.nome_jogador:
-            self.root.quit()
+        self.nome_jogador = ""
         self.total = 0
-        self.ajudas = {"cartas": True, "universitarios": True, "plateia": True}
         self.nivel = 1
-        self.mostrar_pergunta()
+        self.ajudas = {"cartas": True, "universitarios": True, "plateia": True}
+        self.tempo_restante = 20
 
-    def mostrar_pergunta(self):
-        if self.nivel > 17:
-            messagebox.showinfo("Parabéns", f"🎉 {self.nome_jogador}, você venceu e ganhou R${self.total:,}!")
-            salvar_pontuacao(self.nome_jogador, self.total)
-            self.root.quit()
-            return
+        self.frame = tk.Frame(root, bg=COR_FUNDO)
+        self.frame.pack(pady=20)
+
+        self.tela_menu()
+
+    def limpar_tela(self):
+        for widget in self.frame.winfo_children():
+            widget.destroy()
+
+    def tela_menu(self):
+        self.limpar_tela()
+        tk.Label(self.frame, text="SHOW DO MILHÃO", font=("Helvetica", 24, "bold"), fg=COR_DESTAQUE, bg=COR_FUNDO).pack(pady=20)
+
+        ttk.Button(self.frame, text="Jogar", command=self.tela_nome).pack(pady=5)
+        ttk.Button(self.frame, text="Ranking", command=self.tela_ranking).pack(pady=5)
+        ttk.Button(self.frame, text="Instruções", command=self.tela_instrucoes).pack(pady=5)
+        ttk.Button(self.frame, text="Sair", command=self.root.quit).pack(pady=5)
+
+    def tela_nome(self):
+        self.limpar_tela()
+        tk.Label(self.frame, text="Digite seu nome:", fg=COR_TEXTO, bg=COR_FUNDO).pack()
+        self.nome_entry = ttk.Entry(self.frame)
+        self.nome_entry.pack(pady=10)
+        ttk.Button(self.frame, text="Começar", command=self.comecar_jogo).pack()
+
+    def comecar_jogo(self):
+        nome = self.nome_entry.get().strip().title()
+        if nome:
+            self.nome_jogador = nome
+            self.total = 0
+            self.nivel = 1
+            self.ajudas = {"cartas": True, "universitarios": True, "plateia": True}
+            self.proxima_pergunta()
+
+    def atualizar_timer(self):
+        self.timer_label.config(text=f"Tempo restante: {self.tempo_restante}s")
+        self.progress['value'] = self.tempo_restante
+
+        if self.tempo_restante > 10:
+            self.progress.configure(style="Green.Horizontal.TProgressbar")
+        elif self.tempo_restante > 5:
+            self.progress.configure(style="Yellow.Horizontal.TProgressbar")
+        else:
+            self.progress.configure(style="Red.Horizontal.TProgressbar")
+
+        if self.tempo_restante > 0:
+            self.tempo_restante -= 1
+            self.timer_id = self.root.after(1000, self.atualizar_timer)
+        else:
+            messagebox.showinfo("Tempo esgotado", "Você não respondeu a tempo!")
+            self.total = self.total // 2
+            salvar_ranking(self.nome_jogador, self.total)
+            self.tela_menu()
+            self.total = self.total // 2
+            salvar_ranking(self.nome_jogador, self.total)
+            self.tela_menu()
+
+    def proxima_pergunta(self):
+        if hasattr(self, 'timer_id'):
+            self.root.after_cancel(self.timer_id)
+        self.limpar_tela()
+
+        self.tempo_restante = 20
 
         chave = nome_nivel(self.nivel)
-        self.pergunta_atual = random.choice(perguntas_por_nivel.get(chave, []))
-        if not self.pergunta_atual:
-            messagebox.showwarning("Erro", "Sem perguntas disponíveis.")
-            self.root.quit()
+        pergunta = random.choice(perguntas_por_nivel.get(chave, []))
+        self.pergunta_atual = pergunta
+
+        tk.Label(self.frame, text=f"Nível {self.nivel} – Prêmio: R${premios[self.nivel - 1]:,}", fg=COR_DESTAQUE, bg=COR_FUNDO, font=("Helvetica", 14)).pack(pady=10)
+        tk.Label(self.frame, text=pergunta["pergunta"], wraplength=500, fg=COR_TEXTO, bg=COR_FUNDO).pack(pady=10)
+
+        self.timer_label = tk.Label(self.frame, text="", font=("Helvetica", 12), fg=COR_TEXTO, bg=COR_FUNDO)
+        self.timer_label.pack(pady=5)
+        style = ttk.Style()
+        style.theme_use('default')
+        style.configure("Green.Horizontal.TProgressbar", foreground='green', background='green')
+        style.configure("Yellow.Horizontal.TProgressbar", foreground='yellow', background='yellow')
+        style.configure("Red.Horizontal.TProgressbar", foreground='red', background='red')
+
+        self.progress = ttk.Progressbar(self.frame, maximum=20, length=300, mode='determinate', style="Green.Horizontal.TProgressbar")
+        self.progress.pack(pady=5)
+        self.progress['value'] = 20
+        self.timer_id = self.timer_id = self.root.after(1000, self.atualizar_timer)
+
+        frame_opcoes = tk.Frame(self.frame, bg=COR_FUNDO)
+        frame_opcoes.pack(pady=5)
+        self.resposta_escolhida = tk.StringVar()
+        for letra, opcao in pergunta["opcoes"].items():
+            ttk.Radiobutton(frame_opcoes, text=f"{letra}) {opcao}", variable=self.resposta_escolhida, value=letra).pack(anchor="center")
+
+        ttk.Button(self.frame, text="Confirmar", command=self.confirmar_resposta).pack(pady=10)
+
+        frame_ajudas = tk.Frame(self.frame, bg=COR_FUNDO)
+        frame_ajudas.pack(pady=5)
+
+        if self.ajudas["cartas"]:
+            ttk.Button(frame_ajudas, text="Cartas", command=self.ajuda_cartas).pack(side="left", padx=5)
+        if self.ajudas["universitarios"]:
+            ttk.Button(frame_ajudas, text="Universitários", command=self.ajuda_universitarios).pack(side="left", padx=5)
+        if self.ajudas["plateia"]:
+            ttk.Button(frame_ajudas, text="Plateia", command=self.ajuda_plateia).pack(side="left", padx=5)
+
+        ttk.Button(self.frame, text="Desistir", command=self.desistir).pack(pady=30)
+
+
+    def confirmar_resposta(self):
+        resposta = self.resposta_escolhida.get()
+        if not resposta:
+            messagebox.showwarning("Aviso", "Escolha uma opção antes de confirmar.")
             return
 
-        self.frame = Frame(self.root, bg=COR_PRIMARIA)
-        self.frame.pack(expand=True, fill="both")
-
-        label_nivel = Label(self.frame, text=f"Nível {self.nivel} – R$ {premios[self.nivel - 1]:,}", bg=COR_PRIMARIA, fg="white", font=("Arial", 14))
-        label_nivel.pack(pady=10)
-
-        label_pergunta = Label(self.frame, text=self.pergunta_atual["pergunta"], bg=COR_PRIMARIA, fg="white", font=("Arial", 16), wraplength=500)
-        label_pergunta.pack(pady=20)
-
-        for letra, opcao in self.pergunta_atual["opcoes"].items():
-            btn = ttk.Button(self.frame, text=f"{letra}) {opcao}", command=lambda l=letra: self.verificar_resposta(l))
-            btn.pack(pady=5)
-
-        ajuda_frame = Frame(self.frame, bg=COR_PRIMARIA)
-        ajuda_frame.pack(pady=10)
-        for tipo in ["cartas", "universitarios", "plateia"]:
-            if self.ajudas[tipo]:
-                btn = ttk.Button(ajuda_frame, text=tipo.upper(), command=lambda t=tipo: self.usar_ajuda(t))
-                btn.pack(side=LEFT, padx=5)
-
-    def usar_ajuda(self, tipo):
-        correta = self.pergunta_atual["resposta"]
-        opcoes = self.pergunta_atual["opcoes"]
-        if tipo == "cartas":
-            msg = ajuda_cartas(opcoes, correta)
-        elif tipo == "universitarios":
-            msg = ajuda_universitarios(correta)
-        elif tipo == "plateia":
-            msg = ajuda_plateia(correta)
-        else:
-            return
-
-        self.ajudas[tipo] = False
-        messagebox.showinfo("Ajuda", msg)
+        if messagebox.askyesno("Confirmação", f"Tem certeza que deseja escolher a opção '{resposta}'?"):
+            self.verificar_resposta(resposta)
 
     def verificar_resposta(self, resposta):
         correta = self.pergunta_atual["resposta"]
         if resposta == correta:
             self.total = premios[self.nivel - 1]
             self.nivel += 1
-            self.frame.destroy()
-            self.mostrar_pergunta()
+            if self.nivel > 17:
+                messagebox.showinfo("Parabéns!", f"Você venceu e ganhou R${self.total:,}!")
+                salvar_ranking(self.nome_jogador, self.total)
+                self.tela_menu()
+            else:
+                self.proxima_pergunta()
         else:
-            messagebox.showinfo("Fim de jogo", f"❌ Errado! A resposta era '{correta}'.\nVocê ganhou R${self.total:,}.")
-            salvar_pontuacao(self.nome_jogador, self.total)
-            self.root.quit()
+            self.total = self.total // 2
+            messagebox.showinfo("Fim de Jogo", f"Resposta errada! A correta era '{correta}'. Você ganhou R${self.total:,}.")
+            salvar_ranking(self.nome_jogador, self.total)
+            self.tela_menu()
 
-root = Tk()
-app = ShowDoMilhao(root)
-root.mainloop()
+    def desistir(self):
+        if messagebox.askyesno("Desistir", f"Tem certeza que deseja desistir com R${self.total:,}?"):
+            salvar_ranking(self.nome_jogador, self.total)
+            self.tela_menu()
+
+    def ajuda_cartas(self):
+        self.ajudas["cartas"] = False
+        correta = self.pergunta_atual["resposta"]
+        opcoes = self.pergunta_atual["opcoes"]
+        erradas = [k for k in opcoes if k != correta]
+        eliminadas = random.sample(erradas, 2)
+        texto = "Eliminando duas opções erradas:\n"
+        for letra in opcoes:
+            if letra not in eliminadas:
+                texto += f"{letra}) {opcoes[letra]}\n"
+        messagebox.showinfo("Cartas", texto)
+
+    def ajuda_universitarios(self):
+        self.ajudas["universitarios"] = False
+        correta = self.pergunta_atual["resposta"]
+        sugestao = correta if random.random() < 0.8 else random.choice([l for l in "ABCD" if l != correta])
+        messagebox.showinfo("Universitários", f"Acredito que a resposta correta seja: {sugestao}")
+
+    def ajuda_plateia(self):
+        self.ajudas["plateia"] = False
+        correta = self.pergunta_atual["resposta"]
+        porcentagens = {"A": 0, "B": 0, "C": 0, "D": 0}
+        correta_chance = random.randint(60, 80)
+        restantes = [l for l in "ABCD" if l != correta]
+        restantes_chances = sorted([random.randint(5, 20) for _ in range(3)])
+        random.shuffle(restantes)
+        porcentagens[correta] = correta_chance
+        for letra, chance in zip(restantes, restantes_chances):
+            porcentagens[letra] = chance
+
+        texto = "Votos da plateia:\n"
+        for letra, perc in porcentagens.items():
+            texto += f"{letra}) {perc}%\n"
+        messagebox.showinfo("Plateia", texto)
+
+    def tela_ranking(self):
+        self.limpar_tela()
+        tk.Label(self.frame, text="Ranking dos Jogadores", font=("Helvetica", 16, "bold"), fg=COR_DESTAQUE, bg=COR_FUNDO).pack(pady=10)
+
+        ranking = exibir_ranking()
+        for i, (nome, pontos) in enumerate(ranking, 1):
+            tk.Label(self.frame, text=f"{i}. {nome} – R${pontos:,}", fg=COR_TEXTO, bg=COR_FUNDO).pack()
+
+        ttk.Button(self.frame, text="Voltar", command=self.tela_menu).pack(pady=10)
+
+    def tela_instrucoes(self):
+        self.limpar_tela()
+        instrucoes = (
+            "• O jogo possui 17 níveis de dificuldade crescente.\n"
+            "• Cada nível sorteia 1 pergunta.\n"
+            "• Você tem 3 ajudas disponíveis (1 uso por jogo):\n"
+            "   - CARTAS: elimina 2 opções erradas\n"
+            "   - UNIVERSITÁRIOS: dá uma sugestão de resposta\n"
+            "   - PLATÉIA: mostra uma estimativa de votos do público\n"
+            "• Ao errar, você perde metade da sua pontuação atual.\n"
+            "• Ao desistir, você leva a pontuação acumulada."
+        )
+        tk.Label(self.frame, text="Instruções", font=("Helvetica", 16, "bold"), fg=COR_DESTAQUE, bg=COR_FUNDO).pack(pady=10)
+        tk.Label(self.frame, text=instrucoes, wraplength=500, justify="left", fg=COR_TEXTO, bg=COR_FUNDO).pack(pady=10)
+        ttk.Button(self.frame, text="Voltar", command=self.tela_menu).pack(pady=10)
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = ShowDoMilhao(root)
+    root.mainloop()
