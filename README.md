@@ -17,4 +17,4 @@ A interface apresenta:
 1. Execute o arquivo main.py (ou o nome que você estiver usando).
 2. As perguntas serão exibidas na interface gráfica.
 3. Escolha uma das alternativas.
-4. Prossiga pelas perguntas até alcançar o maior prêmio.
+4. Prossiga pelas perguntas até alcançar o maior prêmio/pontuação.
