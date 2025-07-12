@@ -58,6 +58,8 @@ class ShowDoMilhao:
         self.nivel = 1
         self.ajudas = {"cartas": True, "universitarios": True, "plateia": True}
         self.tempo_restante = 20
+        self.perguntas_ja_usadas = {}
+        self.pulos_restantes = 3
 
         self.frame = tk.Frame(root, bg=COR_FUNDO)
         self.frame.pack(pady=20)
@@ -91,6 +93,8 @@ class ShowDoMilhao:
             self.total = 0
             self.nivel = 1
             self.ajudas = {"cartas": True, "universitarios": True, "plateia": True}
+            self.perguntas_ja_usadas = {}
+            self.pulos_restantes = 3
             self.proxima_pergunta()
 
     def atualizar_timer(self):
@@ -112,9 +116,6 @@ class ShowDoMilhao:
             self.total = self.total // 2
             salvar_ranking(self.nome_jogador, self.total)
             self.tela_menu()
-            self.total = self.total // 2
-            salvar_ranking(self.nome_jogador, self.total)
-            self.tela_menu()
 
     def proxima_pergunta(self):
         if hasattr(self, 'timer_id'):
@@ -122,13 +123,22 @@ class ShowDoMilhao:
         self.limpar_tela()
 
         self.tempo_restante = 20
-
         chave = nome_nivel(self.nivel)
-        pergunta = random.choice(perguntas_por_nivel.get(chave, []))
-        self.pergunta_atual = pergunta
+
+        if chave not in self.perguntas_ja_usadas:
+            self.perguntas_ja_usadas[chave] = perguntas_por_nivel.get(chave, []).copy()
+
+        if not self.perguntas_ja_usadas[chave]:
+            messagebox.showinfo("Fim de Jogo", "Não há mais perguntas disponíveis.")
+            salvar_ranking(self.nome_jogador, self.total)
+            self.tela_menu()
+            return
+
+        self.pergunta_atual = random.choice(self.perguntas_ja_usadas[chave])
+        self.perguntas_ja_usadas[chave].remove(self.pergunta_atual)
 
         tk.Label(self.frame, text=f"Nível {self.nivel} – Prêmio: R${premios[self.nivel - 1]:,}", fg=COR_DESTAQUE, bg=COR_FUNDO, font=("Helvetica", 14)).pack(pady=10)
-        tk.Label(self.frame, text=pergunta["pergunta"], wraplength=500, fg=COR_TEXTO, bg=COR_FUNDO).pack(pady=10)
+        tk.Label(self.frame, text=self.pergunta_atual["pergunta"], wraplength=500, fg=COR_TEXTO, bg=COR_FUNDO).pack(pady=10)
 
         self.timer_label = tk.Label(self.frame, text="", font=("Helvetica", 12), fg=COR_TEXTO, bg=COR_FUNDO)
         self.timer_label.pack(pady=5)
@@ -141,12 +151,12 @@ class ShowDoMilhao:
         self.progress = ttk.Progressbar(self.frame, maximum=20, length=300, mode='determinate', style="Green.Horizontal.TProgressbar")
         self.progress.pack(pady=5)
         self.progress['value'] = 20
-        self.timer_id = self.timer_id = self.root.after(1000, self.atualizar_timer)
+        self.timer_id = self.root.after(1000, self.atualizar_timer)
 
         frame_opcoes = tk.Frame(self.frame, bg=COR_FUNDO)
         frame_opcoes.pack(pady=5)
         self.resposta_escolhida = tk.StringVar()
-        for letra, opcao in pergunta["opcoes"].items():
+        for letra, opcao in self.pergunta_atual["opcoes"].items():
             ttk.Radiobutton(frame_opcoes, text=f"{letra}) {opcao}", variable=self.resposta_escolhida, value=letra).pack(anchor="center")
 
         ttk.Button(self.frame, text="Confirmar", command=self.confirmar_resposta).pack(pady=10)
@@ -161,8 +171,10 @@ class ShowDoMilhao:
         if self.ajudas["plateia"]:
             ttk.Button(frame_ajudas, text="Plateia", command=self.ajuda_plateia).pack(side="left", padx=5)
 
-        ttk.Button(self.frame, text="Desistir", command=self.desistir).pack(pady=30)
+        if self.pulos_restantes > 0:
+            ttk.Button(self.frame, text=f"Pular Pergunta ({self.pulos_restantes} restantes)", command=self.pular_pergunta).pack(pady=5)
 
+        ttk.Button(self.frame, text="Desistir", command=self.desistir).pack(pady=30)
 
     def confirmar_resposta(self):
         resposta = self.resposta_escolhida.get()
@@ -189,6 +201,19 @@ class ShowDoMilhao:
             messagebox.showinfo("Fim de Jogo", f"Resposta errada! A correta era '{correta}'. Você ganhou R${self.total:,}.")
             salvar_ranking(self.nome_jogador, self.total)
             self.tela_menu()
+
+    def pular_pergunta(self):
+        if self.pulos_restantes <= 0:
+            messagebox.showinfo("Aviso", "Você já usou todos os seus pulos!")
+            return
+
+        chave = nome_nivel(self.nivel)
+        if len(self.perguntas_ja_usadas.get(chave, [])) < 1:
+            messagebox.showinfo("Aviso", "Não há mais perguntas para pular neste nível.")
+        else:
+            self.pulos_restantes -= 1
+            messagebox.showinfo("Pergunta Pulada", f"Você pulou a pergunta! ({self.pulos_restantes} pulos restantes)")
+            self.proxima_pergunta()
 
     def desistir(self):
         if messagebox.askyesno("Desistir", f"Tem certeza que deseja desistir com R${self.total:,}?"):
