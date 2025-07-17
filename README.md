@@ -53,12 +53,19 @@ a estrutura do jogo vai estar numa pasta ou em módulos no repositório :
 
 show_do_milhao/
 ├── main.py                Executa o jogo
+
 ├── interface.py           Código principal da interface e lógica do jogo
+
 ├── perguntas.py           Lógica para carregar perguntas e dificuldade
+
 ├── ranking.py             Sistema de ranking (salvar, mostrar, deletar)
+
 ├── cores.py               Paleta de cores da interface
+
 ├── perguntas.json         Banco de perguntas por categoria e dificuldade
+
 ├── ranking.txt            Ranking salvo (nome:pontuação) - é gerado automaticamente no jogo depois iniciado/jogado
+
 └── README.md              Instruções e informações do projeto
 
 Requisitos
