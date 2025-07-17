@@ -52,6 +52,7 @@ no caso aqui é interface.py, mas pode mudar ou renomear do jeito que quiser.
 a estrutura do jogo vai estar numa pasta ou em módulos no repositório :
 
 show_do_milhao/
+
 ├── main.py                Executa o jogo
 
 ├── interface.py           Código principal da interface e lógica do jogo
