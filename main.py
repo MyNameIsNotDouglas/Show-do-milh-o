@@ -29,8 +29,30 @@ def obter_dificuldade_por_nivel(nivel):
         return "muito_dificil"
 
 def salvar_ranking(nome, pontuacao):
-    with open("ranking.txt", "a", encoding="utf-8") as f:
-        f.write(f"{nome}:{pontuacao}\n")
+    ranking = []
+    try:
+        with open("ranking.txt", "r", encoding="utf-8") as f:
+            for linha in f:
+                if ":" in linha:
+                    n, p = linha.strip().split(":")
+                    ranking.append((n, int(p)))
+    except FileNotFoundError:
+        pass
+
+    atualizado = False
+    for i, (n, p) in enumerate(ranking):
+        if n == nome:
+            if pontuacao > p:
+                ranking[i] = (nome, pontuacao)
+            atualizado = True
+            break
+
+    if not atualizado:
+        ranking.append((nome, pontuacao))
+
+    with open("ranking.txt", "w", encoding="utf-8") as f:
+        for n, p in ranking:
+            f.write(f"{n}:{p}\n")
 
 def exibir_ranking():
     try:
@@ -80,6 +102,7 @@ class ShowDoMilhao:
 
         ttk.Button(self.frame, text="Jogar", command=self.tela_nome).pack(pady=5)
         ttk.Button(self.frame, text="Ranking", command=self.tela_ranking).pack(pady=5)
+        ttk.Button(self.frame, text="Remover Jogador do Ranking", command=self.tela_remover_jogador).pack(pady=5)
         ttk.Button(self.frame, text="Instruções", command=self.tela_instrucoes).pack(pady=5)
         ttk.Button(self.frame, text="Sair", command=self.root.quit).pack(pady=5)
 
@@ -268,6 +291,38 @@ class ShowDoMilhao:
             tk.Label(self.frame, text=f"{i}. {nome} – R${pontos:,}", fg=COR_TEXTO, bg=COR_FUNDO).pack()
 
         ttk.Button(self.frame, text="Voltar", command=self.tela_menu).pack(pady=10)
+
+    def tela_remover_jogador(self):
+        self.limpar_tela()
+        tk.Label(self.frame, text="Remover Jogador do Ranking", font=("Helvetica", 16, "bold"), fg=COR_DESTAQUE, bg=COR_FUNDO).pack(pady=10)
+
+        tk.Label(self.frame, text="Digite o nome do jogador:", fg=COR_TEXTO, bg=COR_FUNDO).pack()
+        self.nome_remover_entry = ttk.Entry(self.frame)
+        self.nome_remover_entry.pack(pady=10)
+
+        ttk.Button(self.frame, text="Remover", command=self.remover_jogador).pack(pady=5)
+        ttk.Button(self.frame, text="Voltar", command=self.tela_menu).pack(pady=5)
+
+    def remover_jogador(self):
+        nome_remover = self.nome_remover_entry.get().strip().title()
+        if not nome_remover:
+            messagebox.showwarning("Aviso", "Digite um nome.")
+            return
+
+        try:
+            with open("ranking.txt", "r", encoding="utf-8") as f:
+                linhas = f.readlines()
+            novas_linhas = [linha for linha in linhas if not linha.lower().startswith(nome_remover.lower() + ":")]
+
+            if len(novas_linhas) == len(linhas):
+                messagebox.showinfo("Info", f"Nenhum jogador chamado '{nome_remover}' foi encontrado.")
+            else:
+                with open("ranking.txt", "w", encoding="utf-8") as f:
+                    f.writelines(novas_linhas)
+                messagebox.showinfo("Sucesso", f"Jogador '{nome_remover}' removido com sucesso.")
+            self.tela_menu()
+        except FileNotFoundError:
+            messagebox.showwarning("Erro", "Arquivo de ranking não encontrado.")
 
     def tela_instrucoes(self):
         self.limpar_tela()
