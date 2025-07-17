@@ -27,7 +27,7 @@ A interface apresenta:
 
 1. Execute o arquivo principal
 
-no caso aqui é interface.py, mas pode mudar ou renomear do jeito que quiser. 
+ -obs : no caso aqui é interface.py, mas pode mudar ou renomear do jeito que quiser. 
 
 2. Depois do jogo iniciado. Digite seu nome
 
@@ -35,19 +35,19 @@ no caso aqui é interface.py, mas pode mudar ou renomear do jeito que quiser.
 
 4. Responda as perguntas
 
--Use as ajudas se necessário
+ -Use as ajudas se necessário
 
--Pule até 3 perguntas se quiser
+ -Pule até 3 perguntas se quiser
 
--Cuidado com o tempo!
+ -Cuidado com o tempo!
 
 5. O jogo termina:
 
--Se acertar todas : Ganha R$1.000.000
+ -Se acertar todas : Ganha R$1.000.000
 
--Se errar ou acabar o tempo : Perde metade da pontuação atual
+ -Se errar ou acabar o tempo : Perde metade da pontuação atual
 
--Se desistir : Leva a pontuação acumulada
+ -Se desistir : Leva a pontuação acumulada
 
 a estrutura do jogo vai estar numa pasta ou em módulos no repositório :
 
