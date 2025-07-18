@@ -13,6 +13,7 @@ Este jogo simula o formato de quiz com até 17 níveis, premiações progressiva
 - Perguntas categorizadas por dificuldade (fácil a muito difícil)
 
 ## 🖼 Interface Gráfica
+<img width="415" height="464" alt="Image" src="https://github.com/user-attachments/assets/4db65b93-28ac-419d-8ae6-a90c3cc7c6ba" />
 
 A interface apresenta:
 
